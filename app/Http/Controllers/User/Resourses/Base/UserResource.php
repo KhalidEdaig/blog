@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User\Resources\Base;
+namespace App\Http\Controllers\User\Resourses\Base;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,8 +17,9 @@ class UserResource extends JsonResource
   {
     return [
       'id' => $this->id,
-      'username' => $this->firstname,
+      'username' => $this->username,
       'email' => $this->email,
+      'is_active' => $this->active,
       'role' =>  $this->getRoleNames()[0],
       'perms' => $this->getPermissionNames(),
       'created_at' => Carbon::parse($this->created_at)->toDateTimeString()

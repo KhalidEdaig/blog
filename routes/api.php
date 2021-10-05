@@ -19,8 +19,11 @@ Route::group(['middleware' => 'jwt.auth'], function () {
   Route::group(['middleware' => 'role:admin'], function () {
     Route::get('users', [UserController::class, 'all']);
     Route::Apiresource('categories', CategoryController::class);
+    Route::put('users/{id}/bloc-or-unbloc', [UserController::class, 'blockOrUnblock']);
   });
-
+  Route::group(['middleware' => 'role:publisher'], function () {
+    Route::put('posts/{id}/publish-or-unpublish', [PostController::class, 'publishOrUnPublish']);
+  });
   Route::get('categories', [CategoryController::class, 'index']);
   Route::Apiresource('posts', PostController::class);
 });

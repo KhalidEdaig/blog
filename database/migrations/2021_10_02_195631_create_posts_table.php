@@ -24,6 +24,7 @@ class CreatePostsTable extends Migration
       $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
       $table->uuid('user_id')->nullable();
       $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+      $table->softDeletes();
       $table->timestamps();
     });
   }

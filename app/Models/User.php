@@ -48,6 +48,8 @@ class User extends Authenticatable implements JWTSubject
 
   protected $primaryKey = 'id';
 
+  protected $keyType = "uuid";
+
   public function posts()
   {
     return $this->hasMany(Post::class);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User\Resources\Pagination;
+namespace App\Http\Controllers\User\Resourses\Pagination;
 
 use App\Http\Controllers\User\Resources\Base\UserResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;

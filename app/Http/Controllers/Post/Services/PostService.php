@@ -4,18 +4,19 @@ namespace App\Http\Controllers\Post\Services;
 
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Builder;
-use phpDocumentor\Reflection\Types\Boolean;
+use Illuminate\Support\Facades\Log;
 
 class PostService
 {
 
-  public function getByPagination(Boolean $isPublished = null, string $user_id = null, Boolean $isSorted = null)
+  public function getByPagination($isPublished = null, string $user_id = null, string $isSorted = null)
   {
+
     return Post::when($user_id, function (Builder $q) use ($user_id) {
       $q->whereUserId($user_id);
     })
-      ->when($isPublished, function (Builder $q) use ($isPublished) {
-        $q->wherePublished($isPublished);
+      ->when($isPublished !== null, function (Builder $q) use ($isPublished) {
+        $q->wherePublished(filter_var($isPublished, FILTER_VALIDATE_BOOLEAN));
       })
       ->when($isSorted, function (Builder $q) {
         $q->orderBy('created_at', 'ASC')->get();
@@ -47,6 +48,6 @@ class PostService
 
   public function remove(Post $post)
   {
-    return  $post->delete();
+    return $post->delete();
   }
 }

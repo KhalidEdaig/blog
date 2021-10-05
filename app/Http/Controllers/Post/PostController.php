@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Post;
 
 use App\Enums\eRespCode;
 use App\Http\Controllers\Post\Requests\CreatePostRequest;
+use App\Http\Controllers\Post\Requests\ForceDeletePostRequest;
+use App\Http\Controllers\Post\Requests\UpdatePostRequest;
 use App\Http\Controllers\Post\Resources\Base\PostResource;
 use App\Http\Controllers\Post\Resources\Pagination\PostPaginationResourceCollection;
 use App\Http\Controllers\Post\Services\PostService;
@@ -31,10 +33,14 @@ class PostController extends ResponseController
    */
   public function index()
   {
-
     try {
-      $isAdmin = $this->auth->hasRole('admin');
-      $isAdmin ? $posts = $this->postService->getByPagination(null, request()->user_id) : $posts = $this->postService->getByPagination(null, auth()->user()->id);
+
+      $published = \request()->has('published')  ? request()->published : null;
+
+      $sorted = \request()->has('sorted')  ? request()->sorted : null;
+      $this->auth->hasRole('admin')
+        ? $posts = $this->postService->getByPagination($published, request()->user_id, $sorted)
+        : $posts = $this->postService->getByPagination($published, auth()->user()->id, $sorted);
       return $this->resp->ok(
         eRespCode::C_LISTED_200_00,
         new PostPaginationResourceCollection($posts)
@@ -54,11 +60,11 @@ class PostController extends ResponseController
    */
   public function show(Post $post)
   {
-    // if (!auth()->user()->can('view', $post))
-    //   return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
+    if (!auth()->user()->can('view', $post))
+      return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
 
     try {
-      return $this->resp->created(
+      return $this->resp->ok(
         eRespCode::P_GET_200_03,
         new PostResource($post->load('category'))
       );
@@ -76,8 +82,8 @@ class PostController extends ResponseController
    */
   public function store(CreatePostRequest $request)
   {
-    // if (!$request->user()->can('create', Post::class))
-    //   return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
+    if (!$request->user()->can('create', Post::class))
+      return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
 
     try {
       return $this->resp->created(
@@ -97,10 +103,10 @@ class PostController extends ResponseController
    * @param  \App\Models\Post  $post
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, Post $post)
+  public function update(UpdatePostRequest $request, Post $post)
   {
-    // if (!$request->user()->can('update', $post))
-    //   return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
+    if (!$request->user()->can('update', $post))
+      return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
     try {
       return $this->resp->ok(
         eRespCode::P_UPDATED_200_01,
@@ -120,8 +126,9 @@ class PostController extends ResponseController
    */
   public function destroy(Post $post)
   {
-    // if (!auth()->user()->can('delete', $post))
-    //   return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
+    if (!auth()->user()->can('delete', $post))
+      return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
+
     try {
       $this->postService->remove($post);
       return $this->resp->ok(eRespCode::P_DELETED_200_02);
@@ -129,5 +136,13 @@ class PostController extends ResponseController
       Log::error($th);
       return $this->resp->guessResponse(eRespCode::_500_INTERNAL_ERROR);
     }
+  }
+
+  public function publishOrUnPublish($postId)
+  {
+    $post = Post::find($postId);
+    $post->published = !$post->published;
+    $post->save();
+    return $this->resp->ok(eRespCode::P_UPDATED_200_01, new PostResource($post->load('category')));
   }
 }

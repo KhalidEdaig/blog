@@ -7,6 +7,16 @@ use App\Http\Controllers\ResponseController;
 
 class AuthController extends ResponseController
 {
+
+  /**
+   * Create a new AuthController instance.
+   *
+   * @return void
+   */
+  public function __construct()
+  {
+    parent::__construct();
+  }
   /**
    * Get a JWT via given credentials.
    *
