@@ -11,7 +11,8 @@ use App\Http\Controllers\Post\Resources\Pagination\PostPaginationResourceCollect
 use App\Http\Controllers\Post\Services\PostService;
 use App\Http\Controllers\ResponseController;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewAuthorPost;
 use Illuminate\Support\Facades\Log;
 
 class PostController extends ResponseController
@@ -86,9 +87,13 @@ class PostController extends ResponseController
       return $this->resp->guessResponse(eRespCode::_403_NOT_AUTHORIZED);
 
     try {
+      $post = $this->postService->create($request->validated() + ['user_id' => $this->auth->id]);
+      $user = User::Role('admin')->first();
+
+      $user->notify(new NewAuthorPost($post));
       return $this->resp->created(
         eRespCode::P_CREATED_201_00,
-        new PostResource($this->postService->create($request->validated() + ['user_id' => $this->auth->id])->load('category'))
+        new PostResource($post->load('category')->load('user'))
       );
     } catch (\Throwable $th) {
       Log::error($th);

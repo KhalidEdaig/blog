@@ -52,10 +52,10 @@ class UsersTableSeeder extends Seeder
     ]);
     $publisher->assignRole($role2->name);
     $publisher->givePermissionTo('posts.*');
-    // $publisher->givePermissionTo('posts.create');
-    // $publisher->givePermissionTo('posts.update');
-    // $publisher->givePermissionTo('posts.delete');
-    // $publisher->givePermissionTo('posts.view');
+    $publisher->givePermissionTo('posts.create');
+    $publisher->givePermissionTo('posts.update');
+    $publisher->givePermissionTo('posts.delete');
+    $publisher->givePermissionTo('posts.view');
     $publisher->givePermissionTo('categories.view');
 
     $publisher = User::create([
@@ -66,10 +66,10 @@ class UsersTableSeeder extends Seeder
 
     $publisher->assignRole($role2->name);
     $publisher->givePermissionTo('posts.*');
-    // $publisher->givePermissionTo('posts.create');
-    // $publisher->givePermissionTo('posts.update');
-    // $publisher->givePermissionTo('posts.delete');
-    // $publisher->givePermissionTo('posts.view');
+    $publisher->givePermissionTo('posts.create');
+    $publisher->givePermissionTo('posts.update');
+    $publisher->givePermissionTo('posts.delete');
+    $publisher->givePermissionTo('posts.view');
     $publisher->givePermissionTo('categories.view');
   }
 }
